@@ -1,0 +1,8 @@
+services:
+  bot:
+    image: ghcr.io/zjudgenie/auleliberepolimi-bot:1.0
+    container_name: auleliberepolimi
+    build: ./
+    volumes:
+      - ./.env:/app/.env
+    restart: unless-stopped
