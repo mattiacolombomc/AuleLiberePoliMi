@@ -75,6 +75,7 @@ for lang in texts:
 KEYBOARDS = keyboard_builder.KeyboadBuilder(texts , location_dict)
 
 TOKEN = os.environ.get("TOKEN")
+ADMIN_ID = os.environ.get("ADMIN_ID")  # ID per notifiche di monitoraggio
 
 
 
@@ -422,6 +423,20 @@ def cancel(update: Update, context: CallbackContext):
 
 """BOT INITIALIZATION"""
 
+def send_startup_notification(context: CallbackContext):
+    """Invia notifica quando il bot è online"""
+    if ADMIN_ID:
+        try:
+            context.bot.send_message(
+                chat_id=ADMIN_ID,
+                text="✅ Bot Aule Libere PoliMi è online!\n\n🕐 Orario: {}".format(
+                    datetime.now(pytz.timezone('Europe/Rome')).strftime("%d/%m/%Y %H:%M:%S")
+                )
+            )
+            logging.info("Startup notification sent to admin")
+        except Exception as e:
+            logging.error("Failed to send startup notification: %s", str(e))
+
 def main():
     #add persistence for states
     pp = PicklePersistence(filename='aulelibere_pp')
@@ -452,6 +467,9 @@ def main():
     dispatcher.add_handler(conv_handler)
 
     updater.start_polling()
+
+    # Invia notifica di avvio dopo 1 secondo
+    updater.job_queue.run_once(send_startup_notification, when=1)
 
     updater.idle()
 
