@@ -449,7 +449,10 @@ def start_flask_server():
         return 'OK', 200
 
     port = int(os.environ.get('PORT', 10000))
-    app.run(host='0.0.0.0', port=port, debug=False, use_reloader=False)
+    try:
+        app.run(host='0.0.0.0', port=port, debug=False, use_reloader=False, threaded=True)
+    except Exception as e:
+        logging.error("Flask server error: %s", str(e))
 
 def main():
     # Start Flask server in a separate thread for Render health checks
