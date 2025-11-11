@@ -1,7 +1,7 @@
 {
     "texts":
     {
-        "welcome": "Ciao <b>{}</b>! Questo è Aule Libere Polimi bot, con questo bot sarai in grado di cercare le aule libere per l'intera settimana!\nQuesto bot è un fork del progetto originale di <b><a href='https://github.com/zJudGenie/AuleLiberePoliMi'>zJudGenie</a></b>, mantenuto da <b><a href='https://github.com/mattiacolombomc/AuleLiberePoliMi'>mattiacolombomc</a></b> e deployato da <b>@admaiorasemper7</b>.\nPer qualsiasi problema, chiedi pure!\nSe vuoi ulteriori informazioni premi info!\nPuoi terminare in qualsiasi momento la conversazione con il comando /terminate , attenzione così facendo eliminerai tutte le tue preferenze!",
+        "welcome": "Ciao <b>{}</b>! Questo è Aule Libere Polimi bot, con questo bot sarai in grado di cercare le aule libere per l'intera settimana!\nQuesto bot è un fork del progetto originale di <b><a href='https://github.com/feDann/AuleLiberePoliMi'>feDann</a></b>, forked da <b><a href='https://github.com/zJudGenie/AuleLiberePoliMi'>zJudGenie</a></b>, mantenuto da <b><a href='https://github.com/mattiacolombomc/AuleLiberePoliMi'>mattiacolombomc</a></b> e deployato da <b>@admaiorasemper7</b>.\nPer qualsiasi problema, chiedi pure!\nSe vuoi ulteriori informazioni premi info!\nPuoi terminare in qualsiasi momento la conversazione con il comando /terminate , attenzione così facendo eliminerai tutte le tue preferenze!",
         "location": "Seleziona il campus",
         "day" : "Seleziona il giorno",
         "starting_time" : "Seleziona l'orario iniziale",
