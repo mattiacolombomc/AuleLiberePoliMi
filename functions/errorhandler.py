@@ -11,9 +11,11 @@ from telegram.ext import Updater, CallbackContext, CommandHandler
 def error_handler(update: object, context: CallbackContext) -> None:
     """
     error handler function for the bot, notify the developer of any issue and
-    send to him the stackstrace of the exception that occurred
+    send to him the stackstrace of the exception that occurred.
+    Also notifies the user who triggered the error with a link to contact the developer.
     """
     DEVELOPER_CHAT_ID = os.environ.get("DEVELOPER_CHAT_ID")
+    CHANNEL_ID = os.environ.get("CHANNEL_ID")
 
     logging.error(msg="Exception while handling an update:", exc_info=context.error)
 
@@ -30,9 +32,24 @@ def error_handler(update: object, context: CallbackContext) -> None:
         f'<pre>{html.escape(tb_string)}</pre>'
     )
 
-    # Finally, send the message
-    if DEVELOPER_CHAT_ID:
-        context.bot.send_message(chat_id=DEVELOPER_CHAT_ID, text=message, parse_mode=ParseMode.HTML)
+    # Send detailed error to the private channel
+    if CHANNEL_ID:
+        try:
+            context.bot.send_message(chat_id=CHANNEL_ID, text=message, parse_mode=ParseMode.HTML)
+        except Exception as e:
+            logging.error(f"Failed to send error message to channel: {e}")
+
+    # Notify the user who triggered the error
+    if isinstance(update, Update) and update.effective_message:
+        user_message = (
+            f"⚠️ Oops! Something went wrong while processing your request.\n\n"
+            f"Please report this issue by clicking the button below:\n\n"
+            f'<a href="tg://user?id={DEVELOPER_CHAT_ID}">📧 Contact Developer</a>'
+        )
+        try:
+            update.effective_message.reply_text(user_message, parse_mode=ParseMode.HTML)
+        except Exception as e:
+            logging.error(f"Failed to send error notification to user: {e}")
 
 # Helper functions for error messages and string builder
 
