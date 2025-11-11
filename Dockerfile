@@ -13,12 +13,12 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential
 
-RUN --mount=type=cache,id=uv-cache-1,target=/root/.cache/uv \
+RUN --mount=type=cache,id=cache/uv,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
     uv sync --locked --no-install-project --no-dev
 COPY . /app
-RUN --mount=type=cache,id=uv-cache-1,target=/root/.cache/uv \
+RUN --mount=type=cache,id=cache/uv,target=/root/.cache/uv \
     uv sync --locked --no-dev
 
 
