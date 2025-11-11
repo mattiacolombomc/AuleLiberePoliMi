@@ -76,6 +76,7 @@ KEYBOARDS = keyboard_builder.KeyboadBuilder(texts , location_dict)
 
 TOKEN = os.environ.get("TOKEN")
 ADMIN_ID = os.environ.get("ADMIN_ID")  # ID per notifiche di monitoraggio
+CHANNEL_ID = os.environ.get("CHANNEL_ID")  # ID del canale privato per notifiche
 
 
 
@@ -424,16 +425,16 @@ def cancel(update: Update, context: CallbackContext):
 """BOT INITIALIZATION"""
 
 def send_startup_notification(context: CallbackContext):
-    """Invia notifica quando il bot è online"""
-    if ADMIN_ID:
+    """Invia notifica quando il bot è online al canale privato"""
+    if CHANNEL_ID:
         try:
             context.bot.send_message(
-                chat_id=ADMIN_ID,
+                chat_id=CHANNEL_ID,
                 text="✅ Bot Aule Libere PoliMi è online!\n\n🕐 Orario: {}".format(
                     datetime.now(pytz.timezone('Europe/Rome')).strftime("%d/%m/%Y %H:%M:%S")
                 )
             )
-            logging.info("Startup notification sent to admin")
+            logging.info("Startup notification sent to channel")
         except Exception as e:
             logging.error("Failed to send startup notification: %s", str(e))
 
