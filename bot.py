@@ -10,11 +10,13 @@ import telegram
 from telegram.message import Message
 from search.free_classroom import find_free_room
 from search.find_classrooms import TIME_SHIFT , MAX_TIME , MIN_TIME
-from telegram import  Update , ReplyKeyboardMarkup ,ReplyKeyboardRemove  
+from telegram import  Update , ReplyKeyboardMarkup ,ReplyKeyboardRemove
 from telegram.ext import (PicklePersistence,Updater,CommandHandler,ConversationHandler,CallbackContext,MessageHandler , Filters , CallbackQueryHandler)
 from datetime import datetime , timedelta
 from telegram import ParseMode
 from functions import errorhandler , string_builder , input_check , keyboard_builder , user_data_handler ,regex_builder
+from flask import Flask
+from threading import Thread
 
 
 LOGPATH = "log/"
@@ -438,10 +440,26 @@ def send_startup_notification(context: CallbackContext):
         except Exception as e:
             logging.error("Failed to send startup notification: %s", str(e))
 
+def start_flask_server():
+    """Start a simple Flask server for Render health checks"""
+    app = Flask(__name__)
+
+    @app.route('/')
+    def health_check():
+        return 'OK', 200
+
+    port = int(os.environ.get('PORT', 10000))
+    app.run(host='0.0.0.0', port=port, debug=False, use_reloader=False)
+
 def main():
+    # Start Flask server in a separate thread for Render health checks
+    flask_thread = Thread(target=start_flask_server, daemon=True)
+    flask_thread.start()
+    logging.info("Flask server started in background thread")
+
     #add persistence for states
     pp = PicklePersistence(filename='aulelibere_pp')
-    
+
     regex = regex_builder.RegexBuilder(texts)
 
     updater = Updater(token=TOKEN , use_context=True , persistence=pp)
@@ -461,7 +479,7 @@ def main():
             SET_TIME: [MessageHandler(Filters.text & ~Filters.command , set_time)]
             },
         fallbacks=[CommandHandler('terminate' , terminate)  , MessageHandler(Filters.regex(regex.info_regex()) , info), MessageHandler(Filters.regex(regex.cancel_command()), cancel)],
-    
+
     persistent=True,name='search_room_c_handler',allow_reentry=True)
 
     dispatcher.add_error_handler(errorhandler.error_handler)
