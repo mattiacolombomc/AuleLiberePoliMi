@@ -61,6 +61,12 @@ ADMIN_ID=YOUR_ADMIN_USER_ID
 - Customizable campus and time duration preferences
 - Date and time selection with validation
 
+# Credits
+
+This bot is a fork of the original project by **[feDann](https://github.com/feDann/AuleLiberePoliMi)**, forked by **[zJudGenie](https://github.com/zJudGenie/AuleLiberePoliMi)**, and maintained and deployed by **[mattiacolombomc](https://github.com/mattiacolombomc/AuleLiberePoliMi)** (@admaiorasemper7 on Telegram).
+
+For any issues or questions, please contact us on Telegram: [@admaiorasemper7](https://telegram.me/admaiorasemper7)
+
  # Disclaimer
 This bot will work as long as the PoliMi website keeps the same layout
 
