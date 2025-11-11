@@ -31,10 +31,35 @@ python-dotenv
  with the command :
  ``` pip install <package> ``` 
 ## Config
-Now you simply have to create a ``` .env ``` file and insert the token of your telegram bot saved as:
+Now you simply have to create a ``` .env ``` file and insert the following environment variables:
+
 ```
-TOKEN=YOURTOKEN
+TOKEN=YOUR_BOT_TOKEN
+DEVELOPER_CHAT_ID=YOUR_TELEGRAM_USER_ID
+CHANNEL_ID=YOUR_PRIVATE_CHANNEL_ID
+ADMIN_ID=YOUR_ADMIN_USER_ID
 ```
+
+### Environment Variables Explanation
+
+- **TOKEN**: Your Telegram bot token obtained from BotFather
+- **DEVELOPER_CHAT_ID**: Your personal Telegram user ID (used for error notifications and contact links)
+- **CHANNEL_ID**: The ID of your private Telegram channel where error reports will be sent
+- **ADMIN_ID**: Admin user ID for monitoring notifications
+
+## Features
+
+### Error Handling & Notifications
+- **Channel Notifications**: When an exception occurs during bot operations, detailed error reports including stack traces are sent to your private channel (CHANNEL_ID)
+- **User Feedback**: Users who trigger errors receive a friendly notification with a clickable link to contact the developer
+- **Startup Notifications**: The bot sends a notification when it starts up, confirming it's online and operational
+
+### Core Features
+- Search for free classrooms across PoliMi campuses
+- Quick search functionality with saved preferences
+- Multi-language support (Italian and English)
+- Customizable campus and time duration preferences
+- Date and time selection with validation
 
  # Disclaimer
 This bot will work as long as the PoliMi website keeps the same layout
