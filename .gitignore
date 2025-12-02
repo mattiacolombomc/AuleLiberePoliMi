@@ -1,4 +1,5 @@
 .vscode
+.claude
 infos*.json
 aulelibere_pp
 # Byte-compiled / optimized / DLL files
