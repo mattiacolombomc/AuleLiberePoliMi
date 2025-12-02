@@ -440,12 +440,20 @@ def send_startup_notification(context: CallbackContext):
         except Exception as e:
             logging.error("Failed to send startup notification: %s", str(e))
 
-def start_flask_server():
-    """Start a simple Flask server for Render health checks"""
+def start_flask_server(updater):
+    """Start Flask server with webhook endpoint"""
     app = Flask(__name__)
 
     @app.route('/')
     def health_check():
+        return 'OK', 200
+
+    @app.route(f'/{TOKEN}', methods=['POST'])
+    def webhook():
+        """Handle incoming webhook updates from Telegram"""
+        from flask import request
+        update = telegram.Update.de_json(request.get_json(force=True), updater.bot)
+        updater.dispatcher.process_update(update)
         return 'OK', 200
 
     port = int(os.environ.get('PORT', 10000))
@@ -455,11 +463,6 @@ def start_flask_server():
         logging.error("Flask server error: %s", str(e))
 
 def main():
-    # Start Flask server in a separate thread for Render health checks
-    flask_thread = Thread(target=start_flask_server, daemon=True)
-    flask_thread.start()
-    logging.info("Flask server started in background thread")
-
     #add persistence for states
     pp = PicklePersistence(filename='aulelibere_pp')
 
@@ -488,12 +491,42 @@ def main():
     dispatcher.add_error_handler(errorhandler.error_handler)
     dispatcher.add_handler(conv_handler)
 
-    updater.start_polling()
+    # Use webhook mode instead of polling to avoid conflicts
+    use_webhook = os.environ.get('USE_WEBHOOK', 'true').lower() == 'true'
 
-    # Invia notifica di avvio dopo 1 secondo
-    updater.job_queue.run_once(send_startup_notification, when=1)
+    if use_webhook:
+        # Get Railway/Render app URL from environment
+        app_url = os.environ.get('RAILWAY_PUBLIC_DOMAIN') or os.environ.get('RENDER_EXTERNAL_URL')
 
-    updater.idle()
+        if not app_url:
+            logging.error("No webhook URL found. Set RAILWAY_PUBLIC_DOMAIN or RENDER_EXTERNAL_URL or USE_WEBHOOK=false")
+            return
+
+        # Ensure app_url starts with https://
+        if not app_url.startswith('http'):
+            app_url = f'https://{app_url}'
+
+        webhook_url = f'{app_url}/{TOKEN}'
+
+        logging.info(f"Setting webhook to: {webhook_url}")
+
+        # Set webhook
+        updater.bot.set_webhook(url=webhook_url)
+
+        # Send startup notification after setting webhook
+        updater.job_queue.run_once(send_startup_notification, when=1)
+
+        # Start Flask server (blocking - keeps the app running)
+        start_flask_server(updater)
+    else:
+        # Fallback to polling mode (for local development)
+        logging.info("Using polling mode")
+        updater.start_polling()
+
+        # Invia notifica di avvio dopo 1 secondo
+        updater.job_queue.run_once(send_startup_notification, when=1)
+
+        updater.idle()
 
 if __name__ == '__main__':
     main()
