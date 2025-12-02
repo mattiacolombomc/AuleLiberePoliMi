@@ -85,7 +85,7 @@ CHANNEL_ID = os.environ.get("CHANNEL_ID")  # ID del canale privato per notifiche
 """
 States for the conversation handler
 """
-INITIAL_STATE, SET_LOCATION , SET_DAY , SET_START_TIME ,  SET_END_AND_SEND , SETTINGS , SET_LANG , SET_CAMPUS , SET_TIME , NOW= range(10)
+INITIAL_STATE, SET_LOCATION , SET_DAY , SET_START_TIME ,  SET_END_AND_SEND , SETTINGS , SET_LANG , SET_CAMPUS , SET_TIME , NOW, SET_FILTERS= range(11)
 
 
 
@@ -321,22 +321,56 @@ def set_day_state(update: Update , context: CallbackContext) ->int:
 def set_start_time_state(update: Update , context: CallbackContext) ->int:
     """
     In this state is saved in the user_data the starting time of the search process,
-    if the input check goes well it returns to the end_state, otherwise remain in the same state
+    if the input check goes well it returns to the filters state, otherwise remain in the same state
     """
     user = update.message.from_user
     message = update.message.text
     lang = user_data_handler.get_lang(context)
     logging.info("%d : %s in set start state" ,user.id , user.username)
     ret,start_time = input_check.start_time_check(message)
-    
+
     if not ret:
         errorhandler.bonk(update , texts , lang )
         return SET_START_TIME
 
     context.user_data['start_time'] = start_time
-    update.message.reply_text(texts[lang]["texts"]['ending_time'],reply_markup=ReplyKeyboardMarkup(KEYBOARDS.end_time_keyboard(lang ,start_time ) , one_time_keyboard=True) )
+    update.message.reply_text(texts[lang]["texts"]['filters'],reply_markup=ReplyKeyboardMarkup(KEYBOARDS.filters_keyboard(lang) , one_time_keyboard=True) )
 
-    return SET_END_AND_SEND
+    return SET_FILTERS
+
+
+def set_filters_state(update: Update , context: CallbackContext) ->int:
+    """
+    In this state users can select filters for the search.
+    Filters include: power plugs, minimum duration
+    """
+    user = update.message.from_user
+    message = update.message.text
+    lang = user_data_handler.get_lang(context)
+    logging.info("%d : %s in set filters state" ,user.id , user.username)
+
+    # Initialize filters if not exists
+    if 'filters' not in context.user_data:
+        context.user_data['filters'] = {'power_plugs': False, 'min_duration': None}
+
+    # Check what filter button was pressed
+    if message == texts[lang]["keyboards"]["power_plugs"]:
+        context.user_data['filters']['power_plugs'] = not context.user_data['filters']['power_plugs']
+        status = "✅" if context.user_data['filters']['power_plugs'] else "❌"
+        update.message.reply_text(f"{texts[lang]['keyboards']['power_plugs']}: {status}",
+                                reply_markup=ReplyKeyboardMarkup(KEYBOARDS.filters_keyboard(lang), one_time_keyboard=True))
+        return SET_FILTERS
+
+    elif message == texts[lang]["keyboards"]["skip_filters"]:
+        # Go to ending time selection
+        start_time = context.user_data['start_time']
+        update.message.reply_text(texts[lang]["texts"]['ending_time'],
+                                reply_markup=ReplyKeyboardMarkup(KEYBOARDS.end_time_keyboard(lang, start_time), one_time_keyboard=True))
+        return SET_END_AND_SEND
+
+    else:
+        errorhandler.bonk(update, texts, lang)
+        return SET_FILTERS
 
 
 def end_state(update: Update , context: CallbackContext) ->int:
@@ -362,8 +396,12 @@ def end_state(update: Update , context: CallbackContext) ->int:
     logging.info("%d : %s in the set end time state and search" ,user.id , user.username)
     
     day , month , year = date.split('/')
+
+    # Get filters from user_data
+    filters = context.user_data.get('filters', {'power_plugs': False, 'min_duration': None})
+
     try:
-        available_rooms = find_free_room(float(start_time + TIME_SHIFT) , float(end_time + TIME_SHIFT) , location_dict[location],int(day) , int(month) , int(year))  
+        available_rooms = find_free_room(float(start_time + TIME_SHIFT) , float(end_time + TIME_SHIFT) , location_dict[location],int(day) , int(month) , int(year), filters)  
         update.message.reply_text('{}   {}   {}-{}'.format(date , location , start_time ,end_time))
         for m in string_builder.room_builder_str(available_rooms , texts[lang]["texts"]["until"]):
             update.message.reply_chat_action(telegram.ChatAction.TYPING)
@@ -478,6 +516,7 @@ def main():
             SET_LOCATION : [MessageHandler(Filters.text & ~Filters.command,set_location_state)],
             SET_DAY : [MessageHandler(Filters.regex(regex.date_regex()) | Filters.regex(regex.date_string_regex()), set_day_state )],
             SET_START_TIME : [MessageHandler(Filters.text & ~Filters.command,set_start_time_state)],
+            SET_FILTERS : [MessageHandler(Filters.text & ~Filters.command, set_filters_state)],
             SET_END_AND_SEND : [MessageHandler(Filters.text & ~Filters.command, end_state)],
             SETTINGS : [MessageHandler(Filters.regex(regex.settings_regex()) , settings)],
             SET_LANG : [MessageHandler(Filters.text & ~Filters.command , set_language)],

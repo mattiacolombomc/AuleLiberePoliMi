@@ -18,7 +18,10 @@
         "success" : "Done👍🏻",
         "missing" : "The campus preference is missing!\nTo use this command set the campus preference",
         "exception" : "An exception occurred during the search process☹️\nTry again later or contact <a href='telegram.me/admaiorasemper7'>me</a> for further info",
-        "until" : "free until"
+        "until" : "free until",
+        "filters" : "Do you want to apply filters to the search?",
+        "filters_applied" : "Filters applied✓",
+        "no_filters" : "No filters, search all"
     },
     "keyboards":
     {
@@ -31,6 +34,10 @@
         "time" : "Search Duration",
         "cancel" :  "/Back" ,
         "today": "Today",
-        "tomorrow" : "Tomorrow"         
+        "tomorrow" : "Tomorrow",
+        "filters" : "🔧Filters",
+        "power_plugs" : "🔌With Power",
+        "min_duration" : "⏱️Min Duration",
+        "skip_filters" : "⏭️Skip Filters"
     }
 }

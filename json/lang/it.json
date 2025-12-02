@@ -18,7 +18,10 @@
         "success" : "Fatto👍🏻",
         "missing" : "Non hai ancora indicato il tuo campus preferito!\nPer usare questa funzione devi prima impostare le tue preferenze",
         "exception" : "C'è stato un problema durante la ricerca☹️\nRitenta più tardi o contattami  <a href='telegram.me/admaiorasemper7'>qui</a> per ulteriori informazioni",
-        "until" : "fino alle"
+        "until" : "fino alle",
+        "filters" : "Vuoi applicare dei filtri alla ricerca?",
+        "filters_applied" : "Filtri applicati✓",
+        "no_filters" : "Nessun filtro, cerca tutto"
     },
     "keyboards" : 
     {
@@ -31,6 +34,10 @@
         "time" : "Durata della Ricerca",
         "cancel" :  "/Indietro",
         "today": "Oggi",
-        "tomorrow" : "Domani" 
+        "tomorrow" : "Domani",
+        "filters" : "🔧Filtri",
+        "power_plugs" : "🔌Con Prese",
+        "min_duration" : "⏱️Durata Min",
+        "skip_filters" : "⏭️Salta Filtri"
     }
 }

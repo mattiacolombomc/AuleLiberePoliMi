@@ -37,4 +37,11 @@ class KeyboadBuilder:
     def time_keyboard(self, lang):
         return [[self.texts[lang]["keyboards"]["cancel"]]] + [[x] for x in range(1 , 9)]
 
+    def filters_keyboard(self, lang):
+        """Keyboard for filter selection"""
+        return [
+            [self.texts[lang]["keyboards"]["power_plugs"]],
+            [self.texts[lang]["keyboards"]["skip_filters"]]
+        ]
+
 
