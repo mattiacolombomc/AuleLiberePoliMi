@@ -139,11 +139,24 @@ systemctl enable aulelibere-bot.service
 echo -e "${GREEN}✅ Systemd service creato${NC}"
 echo ""
 
-# 8. Configura firewall (Oracle Cloud usa iptables)
-echo -e "${BLUE}🔥 Configurazione firewall...${NC}"
-# Oracle Cloud blocca le porte di default, non serve configurare nulla
-# Il bot usa polling, non webhook, quindi non serve aprire porte
-echo -e "${GREEN}✅ Firewall configurato (polling mode - no porte esterne)${NC}"
+# 8. Configura firewall per Portainer
+echo -e "${BLUE}🔥 Configurazione firewall per Portainer...${NC}"
+
+# Installa iptables-persistent per salvare le regole
+apt-get install -y iptables-persistent netfilter-persistent
+
+# Apri porta 9000 (Portainer HTTP)
+iptables -I INPUT 6 -m state --state NEW -p tcp --dport 9000 -j ACCEPT
+
+# Apri porta 9443 (Portainer HTTPS)
+iptables -I INPUT 6 -m state --state NEW -p tcp --dport 9443 -j ACCEPT
+
+# Salva le regole
+netfilter-persistent save
+
+echo -e "${GREEN}✅ Firewall configurato${NC}"
+echo -e "${YELLOW}⚠️  IMPORTANTE: Devi anche aprire le porte nella Security List di Oracle Cloud!${NC}"
+echo -e "${YELLOW}    Vedi DEPLOY-ORACLE-CLOUD.md per istruzioni${NC}"
 echo ""
 
 echo -e "${GREEN}=================================================="

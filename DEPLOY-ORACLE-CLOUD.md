@@ -135,6 +135,59 @@ Prova a scrivere `/start` al bot su Telegram!
 
 ---
 
+### **PARTE 3: Configura Portainer (Gestione Docker via Web)**
+
+Portainer è già installato! Ti permette di gestire tutti i container Docker dal browser.
+
+#### 1. Apri le porte su Oracle Cloud Security List
+
+**DEVI fare questo passaggio** altrimenti non potrai accedere a Portainer!
+
+1. **Console Oracle Cloud** → **Menu** (☰) → **Networking** → **Virtual Cloud Networks**
+2. Click sul tuo VCN (quello della VM)
+3. Sidebar sinistra → **Security Lists**
+4. Click su **"Default Security List for..."**
+5. Click **"Add Ingress Rules"**
+
+**Aggiungi questa regola:**
+- **Source CIDR**: `0.0.0.0/0` (tutto internet) o `<TUO_IP>/32` (solo il tuo IP - più sicuro!)
+- **IP Protocol**: TCP
+- **Destination Port Range**: `9000`
+- **Description**: `Portainer`
+- Click **"Add Ingress Rules"**
+
+💡 Per trovare il tuo IP: https://whatismyipaddress.com/
+
+#### 2. Accedi a Portainer
+
+Apri il browser e vai a:
+```
+http://<IP_VM>:9000
+```
+
+**Esempio:**
+```
+http://158.101.123.45:9000
+```
+
+#### 3. Setup Portainer (prima volta)
+
+1. **Crea password admin**
+   - Username: `admin`
+   - Password: scegli una password sicura!
+   - Click **"Create user"**
+
+2. **Seleziona environment**
+   - Click **"Get Started"**
+   - Seleziona **"Local"**
+   - Click **"Connect"**
+
+✅ **Fatto!** Ora puoi gestire Docker dal browser!
+
+**Vedi `PORTAINER-GUIDE.md` per la guida completa su come usare Portainer.**
+
+---
+
 ## 🔧 Gestione del Bot
 
 ### Comandi Utili
