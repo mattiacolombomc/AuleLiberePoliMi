@@ -7,6 +7,9 @@ WORKDIR /app
 # Install uv for faster dependency installation
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
 
+# Install build dependencies for Python packages that need compilation
+RUN apt-get update && apt-get install -y gcc && rm -rf /var/lib/apt/lists/*
+
 # Copy dependency files
 COPY requirements.txt pyproject.toml ./
 
