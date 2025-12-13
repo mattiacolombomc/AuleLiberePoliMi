@@ -137,7 +137,9 @@ Prova a scrivere `/start` al bot su Telegram!
 
 ### **PARTE 3: Configura Portainer (Gestione Docker via Web)**
 
-Portainer è già installato! Ti permette di gestire tutti i container Docker dal browser.
+**Nota:** Se hai usato lo script automatico `oracle-setup.sh`, Portainer è incluso nello stack. Per abilitare l'auto-deploy (consigliato), dovrai separare Portainer dallo stack - vedi sezione "Auto-Deploy con GitHub Webhook" più sotto.
+
+Portainer ti permette di gestire tutti i container Docker dal browser.
 
 #### 1. Apri le porte su Oracle Cloud Security List
 
@@ -214,11 +216,93 @@ sudo docker compose -f /opt/aulelibere/docker-compose.yml logs --tail=100
 
 ### Aggiornare il Bot
 
+**🚀 Aggiornamento automatico (consigliato):**
+
+Se hai configurato il webhook GitHub → Portainer (vedi sezione sotto), il bot si aggiorna automaticamente ad ogni push su `dev`!
+
+Basta fare:
+```bash
+git push origin dev
+```
+
+**📝 Aggiornamento manuale (se non hai webhook):**
+
 ```bash
 cd /opt/aulelibere
 sudo git pull origin dev
-sudo systemctl restart aulelibere-bot
+sudo docker compose build
+sudo docker compose up -d
 ```
+
+---
+
+## 🔄 Auto-Deploy con GitHub Webhook (Consigliato!)
+
+Configura il deploy automatico così ad ogni `git push` il bot si aggiorna automaticamente sulla VM!
+
+### Prerequisiti
+
+- ✅ Portainer deve essere standalone (non nello stack docker-compose.yml)
+- ✅ Stack del bot creato in Portainer tramite Repository Git
+
+### Step 1: Avvia Portainer Standalone (una volta sola)
+
+Se non l'hai già fatto durante il setup iniziale:
+
+```bash
+ssh ubuntu@<IP_VM>
+
+# Ferma lo stack attuale (se Portainer era incluso)
+cd /opt/aulelibere
+sudo docker compose down
+
+# Avvia Portainer standalone
+sudo docker run -d \
+  --name portainer \
+  --restart=unless-stopped \
+  -p 9000:9000 -p 9443:9443 \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -v portainer_data:/data \
+  portainer/portainer-ce:latest
+```
+
+### Step 2: Crea Stack in Portainer
+
+1. Vai su **http://<IP_VM>:9000**
+2. Login con admin
+3. **Stacks** → **+ Add stack**
+4. **Name**: `aulelibere`
+5. **Build method**: `Repository`
+6. **Repository URL**: `https://github.com/mattiacolombomc/AuleLiberePoliMi`
+7. **Repository reference**: `refs/heads/dev`
+8. **Compose path**: `docker-compose.yml`
+9. **GitOps updates**: ✓ **Enable**
+10. **Mechanism**: `Webhook`
+11. **Environment variables**: aggiungi `TOKEN`, `DEVELOPER_CHAT_ID`, `CHANNEL_ID`, `ADMIN_ID`
+12. **Deploy the stack**
+
+### Step 3: Configura Webhook su GitHub
+
+1. **Copia l'URL webhook** da Portainer (apparirà dopo il deploy dello stack)
+2. Vai su: **https://github.com/mattiacolombomc/AuleLiberePoliMi/settings/hooks**
+3. Click **"Add webhook"**
+4. **Payload URL**: incolla l'URL da Portainer (es. `http://80.225.91.200:9000/api/stacks/webhooks/...`)
+5. **Content type**: `application/json`
+6. **Which events**: ☑️ `Just the push event`
+7. **Active**: ✓ spunta
+8. **Add webhook**
+
+### Step 4: Test
+
+```bash
+# Fai un commit di test
+git commit --allow-empty -m "Test auto-deploy"
+git push origin dev
+
+# Il bot si aggiornerà automaticamente sulla VM! 🎉
+```
+
+**Da ora in poi:** basta `git push origin dev` e il bot si aggiorna da solo!
 
 ---
 

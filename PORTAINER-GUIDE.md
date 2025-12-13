@@ -340,6 +340,67 @@ Portainer può mandare webhook quando succede qualcosa:
 
 ---
 
+## 🔄 Auto-Deploy con GitHub Webhook
+
+Configura il deploy automatico per aggiornare i tuoi stack ad ogni push su GitHub!
+
+### Prerequisito: Stack da Repository Git
+
+Il webhook funziona solo con stack creati tramite **Git Repository** (non Web Editor).
+
+### Step 1: Crea Stack da Repository
+
+1. Sidebar → **Stacks** → **+ Add stack**
+2. **Name**: nome dello stack (es. `aulelibere`)
+3. **Build method**: seleziona **`Repository`**
+4. **Repository URL**: `https://github.com/tuouser/tuarepo`
+5. **Repository reference**: `refs/heads/dev` (o `main`)
+6. **Compose path**: `docker-compose.yml`
+7. **GitOps updates**: ✓ **Enable**
+8. **Mechanism**: seleziona **`Webhook`**
+9. Aggiungi **Environment variables** se necessarie
+10. **Deploy the stack**
+
+### Step 2: Copia Webhook URL
+
+Dopo il deploy, nella pagina dello stack vedrai:
+
+```
+Webhook
+http://<IP_VM>:9000/api/stacks/webhooks/abc123-token-secret
+```
+
+**Copia questo URL!** (contiene token segreto)
+
+### Step 3: Configura GitHub Webhook
+
+1. Vai su: **https://github.com/tuouser/tuarepo/settings/hooks**
+2. Click **"Add webhook"**
+3. **Payload URL**: incolla l'URL da Portainer
+4. **Content type**: `application/json`
+5. **Which events**: ☑️ `Just the push event`
+6. **Active**: ✓ spunta
+7. **Add webhook**
+
+### Step 4: Test
+
+```bash
+git commit --allow-empty -m "Test webhook"
+git push origin dev
+```
+
+Vai su Portainer → Stack → dovresti vedere l'aggiornamento automatico! 🎉
+
+### Verifica Webhook su GitHub
+
+Vai su: **Settings** → **Webhooks** → click sul webhook appena creato
+
+Vedrai:
+- ✅ **Segno verde** = webhook funzionante
+- ❌ **X rossa** = c'è un problema (controlla Payload/Response)
+
+---
+
 ## 📚 Risorse
 
 - **Documentazione ufficiale**: https://docs.portainer.io/
