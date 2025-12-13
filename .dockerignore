@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+ENV/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Git
+.git/
+.gitignore
+
+# Logs
+log/
+*.log
+
+# Environment files (will be set in Fly.io secrets)
+.env
+
+# Documentation
+README.md
+LICENSE
+photos/
+
+# Fly.io
+.claude/
+
+# Other
+compose.yml
+Procfile
+aulelibere_pp

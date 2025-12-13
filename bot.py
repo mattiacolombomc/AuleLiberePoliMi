@@ -495,11 +495,13 @@ def main():
     use_webhook = os.environ.get('USE_WEBHOOK', 'true').lower() == 'true'
 
     if use_webhook:
-        # Get Railway/Render app URL from environment
-        app_url = os.environ.get('RAILWAY_PUBLIC_DOMAIN') or os.environ.get('RENDER_EXTERNAL_URL')
+        # Get app URL from environment (supports Railway, Render, and Fly.io)
+        app_url = (os.environ.get('RAILWAY_PUBLIC_DOMAIN') or
+                   os.environ.get('RENDER_EXTERNAL_URL') or
+                   (os.environ.get('FLY_APP_NAME') and f"{os.environ.get('FLY_APP_NAME')}.fly.dev"))
 
         if not app_url:
-            logging.error("No webhook URL found. Set RAILWAY_PUBLIC_DOMAIN or RENDER_EXTERNAL_URL or USE_WEBHOOK=false")
+            logging.error("No webhook URL found. Set RAILWAY_PUBLIC_DOMAIN, RENDER_EXTERNAL_URL, FLY_APP_NAME, or USE_WEBHOOK=false")
             return
 
         # Ensure app_url starts with https://
