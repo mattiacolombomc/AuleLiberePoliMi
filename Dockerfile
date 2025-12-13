@@ -16,8 +16,8 @@ RUN uv pip install --system --no-cache -r requirements.txt
 # Copy application code
 COPY . .
 
-# Create directory for logs
-RUN mkdir -p /app/log
+# Create directories for logs and persistent data
+RUN mkdir -p /app/log /app/data
 
 # Expose port (Fly.io will set PORT env var)
 EXPOSE 8080

@@ -464,7 +464,9 @@ def start_flask_server(updater):
 
 def main():
     #add persistence for states
-    pp = PicklePersistence(filename='aulelibere_pp')
+    # Use /app/data for Docker, current dir otherwise
+    data_dir = '/app/data' if os.path.exists('/app/data') else '.'
+    pp = PicklePersistence(filename=os.path.join(data_dir, 'aulelibere_pp'))
 
     regex = regex_builder.RegexBuilder(texts)
 

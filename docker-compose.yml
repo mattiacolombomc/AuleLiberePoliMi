@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  bot:
+    build: .
+    container_name: aulelibere-bot
+    restart: unless-stopped
+    environment:
+      - TOKEN=${TOKEN}
+      - DEVELOPER_CHAT_ID=${DEVELOPER_CHAT_ID}
+      - CHANNEL_ID=${CHANNEL_ID}
+      - ADMIN_ID=${ADMIN_ID}
+      - USE_WEBHOOK=${USE_WEBHOOK:-false}
+    volumes:
+      # Persist bot data (conversation state)
+      - ./data:/app/data
+      # Persist logs
+      - ./log:/app/log
+    ports:
+      - "8080:8080"
+    networks:
+      - bot-network
+
+networks:
+  bot-network:
+    driver: bridge
